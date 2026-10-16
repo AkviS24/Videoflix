@@ -17,11 +17,11 @@ class RegistrationTests(TestCase):
 
         self.client = APIClient()
         self.url = "/api/register/"
-        self.email = "newuser@exampl.com"
+        self.email = "newuser@example.com"
         self.password = "SecurePassword123!"
 
-    def test_registration_creates_inactive_user_and_send_authentification_mail(self):
-        """Create a inactive user and send a authentification mail for activation."""
+    def test_registration_creates_inactive_user_and_send_authentication_mail(self):
+        """Create an inactive user and send an authentication email for activation."""
 
         response = self.client.post(
             self.url,
