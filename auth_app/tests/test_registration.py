@@ -126,6 +126,34 @@ class RegistrationTests(TestCase):
         user.refresh_from_db()
         self.assertTrue(user.is_active)
 
+    def test_activation_rejects_already_active_user(self):
+        """Reject the activation if the user is already activated."""
+
+        user_model = get_user_model()
+        user = user_model.objects.create_user(
+            username=self.email,
+            email=self.email,
+            password=self.password,
+            is_active=True,
+        )
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        activation_url = f"/api/activate/{uid}/{token}/"
+
+        response = self.client.get(activation_url)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST,
+        )
+        self.assertEqual(
+            response.json(),
+            {"message": "Account activation failed."},
+        )
+
+        user.refresh_from_db()
+        self.assertTrue(user.is_active)
+
     def test_activation_rejects_invalid_activation_token(self):
         """Reject the activation of an inactive user, when the token is invalid."""
 
