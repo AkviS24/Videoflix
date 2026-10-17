@@ -148,3 +148,30 @@ class RegistrationTests(TestCase):
 
         user.refresh_from_db()
         self.assertFalse(user.is_active)
+
+    def test_registration_email_contains_frontend_activation_link(self):
+        """Check that the activation email links to the frontend page."""
+
+        response = self.client.post(
+            self.url,
+            {
+                "email": self.email,
+                "password": self.password,
+                "confirmed_password": self.password,
+            },
+            format='json',
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED,
+        )
+        self.assertEqual(len(mail.outbox), 1)
+
+        email_body = mail.outbox[0].body
+
+        self.assertIn(
+            "http://127.0.0.1:5500/pages/auth/activate.html?uid=",
+            email_body,
+        )
+        self.assertIn("&token=", email_body)
