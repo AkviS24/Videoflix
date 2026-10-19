@@ -5,6 +5,7 @@ from .views import (
     LoginView,
     LogoutView,
     RegistrationView,
+    TokenRefreshView,
 )
 
 
@@ -13,5 +14,6 @@ urlpatterns = [
     path("register/", RegistrationView.as_view(), name="register"),
     path("login/", LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("activate/<uidb64>/<token>/", ActivationView.as_view(), name="activate"),
 ]

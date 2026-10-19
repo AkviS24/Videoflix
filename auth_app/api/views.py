@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from .functions import create_refresh_response, get_access_token
 from .serializers import LoginSerializer, RegistrationSerializer
 
 
@@ -142,6 +143,32 @@ class RegistrationView(APIView):
             },
             status=status.HTTP_201_CREATED,
         )
+
+
+
+class TokenRefreshView(APIView):
+    """Refresh the access-token cookie."""
+
+    permission_classes = []
+    authentication_classes = []
+
+    def post(self, request):
+        """Validate the refresh cookie and issue a new access token."""
+
+        raw_token = request.COOKIES.get("refresh_token")
+        if not raw_token:
+            return Response(
+                {"detail": "Refresh token is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        try:
+            access_token = get_access_token(raw_token)
+        except TokenError:
+            return Response(
+                {"detail": "Invalid refresh token."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        return create_refresh_response(access_token)
 
 
 
