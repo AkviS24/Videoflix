@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.password_validation import validate_password
 
 from rest_framework import serializers
@@ -47,3 +47,27 @@ class RegistrationSerializer(serializers.Serializer):
             password=validated_data["password"],
             is_active=False,
         )
+
+
+
+class LoginSerializer(serializers.Serializer):
+    """Validate credentials and authenticate an active user."""
+
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        """Authenticate the user and rejects invalid credentials."""
+
+        user = authenticate(
+            request=self.context.get("request"),
+            username=attrs["email"].strip().lower(),
+            password=attrs["password"],
+        )
+        if user is None:
+            raise serializers.ValidationError(
+                {"detail": "Invalid email or password."},
+            )
+
+        attrs["user"] = user
+        return attrs

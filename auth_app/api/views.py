@@ -9,8 +9,48 @@ from django.contrib.auth.tokens import default_token_generator
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import RegistrationSerializer
+from .serializers import LoginSerializer, RegistrationSerializer
+
+
+
+class LoginView(APIView):
+    """Authenticate a user and issue JWT cookies."""
+
+    permission_classes = []
+    authentication_classes = []
+
+    def post(self, request):
+        """Validate credentials and set authentication cookies."""
+
+        serializer = LoginSerializer(
+            data=request.data,
+            context={"request": request},
+        )
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
+
+        refresh = RefreshToken.for_user(user)
+        response = Response(
+            {"detail": "Login successful."},
+            status=status.HTTP_200_OK,
+        )
+        response.set_cookie(
+            "access_token",
+            str(refresh.access_token),
+            httponly=True,
+            secure=not settings.DEBUG,
+            samesite="Lax",
+        )
+        response.set_cookie(
+            "refresh_token",
+            str(refresh),
+            httponly=True,
+            secure=not settings.DEBUG,
+            samesite="Lax",
+        )
+        return response
 
 
 
