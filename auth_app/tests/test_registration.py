@@ -18,7 +18,9 @@ class RegistrationTests(TestCase):
     def setUp(self):
         """Initialize the APIClient and the test data."""
 
-        self.client = APIClient()
+        self.client = APIClient(
+            HTTP_ORIGIN="http://127.0.0.1:5500",
+        )
         self.url = "/api/register/"
         self.email = "newuser@example.com"
         self.password = "SecurePassword123!"
