@@ -9,6 +9,7 @@ from django.contrib.auth.tokens import default_token_generator
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .serializers import LoginSerializer, RegistrationSerializer
@@ -50,6 +51,43 @@ class LoginView(APIView):
             secure=not settings.DEBUG,
             samesite="Lax",
         )
+        return response
+
+
+
+class LogoutView(APIView):
+    """Invalidate the refresh token and clear authentication cookies."""
+
+    permission_classes = []
+    authentication_classes = []
+
+    def post(self, request):
+        """Blacklist the refresh token and delete both cookies."""
+
+        raw_token = request.COOKIES.get("refresh_token")
+        if not raw_token:
+            return Response(
+                {"detail": "Refresh token is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        try:
+            RefreshToken(raw_token).blacklist()
+        except TokenError:
+            return Response(
+                {"detail": "Invalid refresh token."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        response = Response(
+            {
+                "detail": (
+                    "Logout successful! All tokens will be deleted. "
+                    "Refresh token is now invalid."
+                )
+            },
+            status=status.HTTP_200_OK,
+        )
+        response.delete_cookie("access_token", samesite="Lax")
+        response.delete_cookie("refresh_token", samesite="Lax")
         return response
 
 
