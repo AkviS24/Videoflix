@@ -242,7 +242,7 @@ class PasswordResetView(APIView):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
             frontend_url = (
-                "http://127.0.0.1:5500/pages/auth/confirm_password.html",
+                "http://127.0.0.1:5500/pages/auth/confirm_password.html"
             )
             reset_url = f"{frontend_url}?uid={uid}&token={token}"
             send_mail(

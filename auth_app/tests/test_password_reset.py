@@ -38,7 +38,7 @@ class PasswordResetTest(TestCase):
             {"email": self.email},
             format="json",
         )
-        print(response.status_code, response.content.decode())
+
         self.assertEqual(
             response.status_code,
             status.HTTP_200_OK,
