@@ -45,6 +45,11 @@ class PasswordResetTest(TestCase):
         )
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn(self.email, mail.outbox[0].to)
+        uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        self.assertIn(
+            f"confirm_password.html?uid={uid}&token=",
+            mail.outbox[0].body,
+        )
 
     def test_password_reset_does_not_disclose_unknown_email(self):
         """Do not reveal whether an email address is registered."""
