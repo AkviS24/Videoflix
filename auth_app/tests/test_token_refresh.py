@@ -25,7 +25,7 @@ class TokenRefreshTest(APITestCase):
         )
 
     def test_refresh_sets_new_access_cookie(self):
-        """Issue a new access-token cookie fo a valid refresh token."""
+        """Issue a new access-token cookie for a valid refresh token."""
 
         user_model = get_user_model()
         user = user_model.objects.create_user(

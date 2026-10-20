@@ -71,3 +71,33 @@ class LoginSerializer(serializers.Serializer):
 
         attrs["user"] = user
         return attrs
+
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    """Validate the email address for a password reset request."""
+
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        """Normalize the email address."""
+
+        return value.strip().lower()
+
+
+class PasswordConfirmSerializer(serializers.Serializer):
+    """Validate the new password and its confirmation."""
+
+    new_password = serializers.CharField(write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        """Check password conformation and password strength."""
+
+        if attrs["new_password"] != attrs["confirm_password"]:
+            raise serializers.ValidationError(
+                {"confirm_password": "Passwords do not match."},
+            )
+
+        validate_password(attrs["new_password"])
+        return attrs

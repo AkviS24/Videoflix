@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-
 def get_access_token(raw_token):
     """Validate a refresh token and return a new access token."""
 

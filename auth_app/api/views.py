@@ -13,7 +13,12 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .functions import create_refresh_response, get_access_token
-from .serializers import LoginSerializer, RegistrationSerializer
+from .serializers import (
+    LoginSerializer,
+    RegistrationSerializer,
+    PasswordResetSerializer,
+    PasswordConfirmSerializer,
+)
 
 
 
@@ -210,5 +215,93 @@ class ActivationView(APIView):
 
         return Response(
             {"message": "Activation succeed."},
+            status=status.HTTP_200_OK,
+        )
+
+
+
+class PasswordResetView(APIView):
+    """Send a password reset link without disclosing account existence."""
+
+    permission_classes = []
+    authentication_classes = []
+
+    def post(self, request):
+        """Send a reset email when eligible account exists."""
+
+        serializer = PasswordResetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data["email"]
+        user_model = get_user_model()
+        user = user_model.objects.filter(
+            email__iexact=email,
+            is_active=True,
+        ).first()
+
+        if user:
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            frontend_url = (
+                "http://127.0.0.1:5500/pages/auth/confirm_password.html",
+            )
+            reset_url = f"{frontend_url}?uid={uid}&token={token}"
+            send_mail(
+                subject="Reset your videoflix password.",
+                message=(
+                    "Use this link to reset your password:\n"
+                    f"{reset_url}"
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+
+        return Response(
+            {"detail": "If the account exists, a reset email was sent."},
+            status=status.HTTP_200_OK,
+        )
+
+
+
+class PasswordConfirmView(APIView):
+    """Validate a reset-token and set a new password."""
+
+    permission_classes = []
+    authentication_classes = []
+
+    def post(self, request, uidb64, token):
+        """Set a new password after validating the reset request."""
+
+        user_model = get_user_model()
+
+        try:
+            user_id = urlsafe_base64_decode(uidb64).decode()
+            user = user_model.objects.get(pk=user_id)
+        except(
+            TypeError,
+            ValueError,
+            OverflowError,
+            user_model.DoesNotExist,
+        ):
+            return Response(
+                {"detail": "Invalid password reset link."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not user.is_active or not default_token_generator.check_token(
+            user, token
+        ):
+            return Response(
+                {"detail": "Invalid password reset link."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = PasswordConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user.set_password(serializer.validated_data["new_password"])
+        user.save(update_fields=["password"])
+
+        return Response(
+            {"detail": "Password reset successful."},
             status=status.HTTP_200_OK,
         )
