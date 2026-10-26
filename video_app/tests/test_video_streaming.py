@@ -17,7 +17,7 @@ class HLSPlaylistTest(APITestCase):
     """Test access to HLS playlist."""
 
     def test_playlist_requires_authentication(self):
-        """Rejects requests without a valid access-token."""
+        """Reject requests without a valid access token."""
 
         url = reverse(
             "video-playlist",
@@ -31,9 +31,9 @@ class HLSPlaylistTest(APITestCase):
         )
 
     def test_playlist_return_file_for_authenticated_user(self):
-        """Return a existing playlist for authenticated users."""
+        """Return an existing playlist for authenticated users."""
 
-        user = get_user_model(). objects.create_user(
+        user = get_user_model().objects.create_user(
             username="streamuser",
             password="TestPassword123!",
         )
@@ -72,7 +72,7 @@ class HLSSegmentTests(APITestCase):
     """Test access to HLS video segments."""
 
     def test_segment_requires_authentication(self):
-        """Rejects request without a valid access-token."""
+        """Reject requests without a valid access token."""
 
         url = reverse(
             "video-segment",
@@ -86,7 +86,7 @@ class HLSSegmentTests(APITestCase):
         )
 
     def test_segment_returns_file_for_authenticated_user(self):
-        """Return a existing video segment to authenticated user."""
+        """Return an existing video segment to an authenticated user."""
 
         user = get_user_model().objects.create_user(
             username="segmentuser",

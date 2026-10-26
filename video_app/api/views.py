@@ -20,7 +20,7 @@ class VideoListView(ListAPIView):
 
 
 class HLSPlaylistView(APIView):
-    """Returns a HLS Playlist for a video and resolution."""
+    """Return an HLS playlist for a video and resolution."""
 
     permission_classes = [IsAuthenticated]
 
@@ -36,7 +36,7 @@ class HLSPlaylistView(APIView):
 
 
 class HLSSegmentView(APIView):
-    """Return a HLS video segment."""
+    """Return an HLS video segment."""
 
     permission_classes = [IsAuthenticated]
 
