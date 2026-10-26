@@ -1,4 +1,5 @@
 from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAuthenticated
 
 from video_app.models import Video
 from .serializers import VideoSerializer
@@ -10,3 +11,4 @@ class VideoListView(ListAPIView):
 
     queryset = Video.objects.prefetch_related("genres").all()
     serializer_class = VideoSerializer
+    permission_classes = [IsAuthenticated]

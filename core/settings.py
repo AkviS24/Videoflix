@@ -178,3 +178,12 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+
+# REST_FRAMEWORK for authentication
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "auth_app.authentication.CookieJWTAuthentication",
+    ),
+}
