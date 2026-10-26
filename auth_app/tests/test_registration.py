@@ -205,3 +205,7 @@ class RegistrationTests(TestCase):
             email_body,
         )
         self.assertIn("&token=", email_body)
+        self.assertIn(
+            f"&token={response.json()['token']}",
+            email_body,
+        )
