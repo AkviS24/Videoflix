@@ -105,13 +105,13 @@ class LoginTests(APITestCase):
         )
 
         for cookie_name in ("access_token", "refresh_token"):
-            cookie=response.cookies[cookie_name]
+            cookie = response.cookies[cookie_name]
             self.assertTrue(cookie["httponly"])
             self.assertEqual(cookie["samesite"], "Lax")
             self.assertEqual(cookie["secure"], not settings.DEBUG)
 
     def test_login_rejects_unknown_email(self):
-        """Reject login attempts for an unknown email adress."""
+        """Reject login attempts for an unknown email address."""
 
         response = self.client.post(
             self.url,

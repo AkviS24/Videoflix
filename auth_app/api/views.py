@@ -156,20 +156,20 @@ class TokenRefreshView(APIView):
 
 
 class ActivationView(APIView):
-    """Activate a user account by using the activation-link from email."""
+    """Activate a user account by using the activation link from email."""
 
     permission_classes = []
     authentication_classes = []
 
     def get(self, request, uidb64, token):
-        """Validate the activation-token and activate the user acccount."""
+        """Validate the activation token and activate the user account."""
 
         user_model = get_user_model()
 
         try:
             user_id = urlsafe_base64_decode(uidb64).decode()
             user = user_model.objects.get(pk=user_id)
-        except(
+        except (
             TypeError,
             ValueError,
             OverflowError,
@@ -192,7 +192,7 @@ class ActivationView(APIView):
         user.save(update_fields=["is_active"])
 
         return Response(
-            {"message": "Activation succeed."},
+            {"message": "Account activated successfully."},
             status=status.HTTP_200_OK,
         )
 

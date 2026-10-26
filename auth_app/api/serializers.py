@@ -13,14 +13,14 @@ class RegistrationSerializer(serializers.Serializer):
     confirmed_password = serializers.CharField(write_only=True)
 
     def validate_email(self, value):
-        """Rejects email adresses that already registered."""
+        """Rejects email addresses that already registered."""
 
         email = value.strip().lower()
         user_model = get_user_model()
 
         if user_model.objects.filter(email__iexact=email).exists():
             raise serializers.ValidationError(
-                "A user with this email adress already exists.",
+                "A user with this email address already exists.",
             )
         return email
 
@@ -29,7 +29,7 @@ class RegistrationSerializer(serializers.Serializer):
 
         if attrs["password"] != attrs["confirmed_password"]:
             raise serializers.ValidationError(
-                {"confirmed_password": "Password do not match."},
+                {"confirmed_password": "Passwords do not match."},
             )
         
         validate_password(attrs["password"])
@@ -57,7 +57,7 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        """Authenticate the user and rejects invalid credentials."""
+        """Authenticate the user and reject invalid credentials."""
 
         user = authenticate(
             request=self.context.get("request"),
@@ -92,7 +92,7 @@ class PasswordConfirmSerializer(serializers.Serializer):
     confirm_password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        """Check password conformation and password strength."""
+        """Check password confirmation and password strength."""
 
         if attrs["new_password"] != attrs["confirm_password"]:
             raise serializers.ValidationError(
