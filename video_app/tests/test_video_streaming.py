@@ -47,7 +47,11 @@ class HLSPlaylistTest(APITestCase):
         with TemporaryDirectory() as temp_dir:
             with override_settings(MEDIA_ROOT=Path(temp_dir)):
                 playlist = (
-                    Path(temp_dir) / "hls" / str(video.id) / "720p" / "index.m3u8"
+                    Path(temp_dir)
+                    / "hls"
+                    / str(video.id)
+                    / "720p"
+                    / "index.m3u8"
                 )
                 playlist.parent.mkdir(parents=True)
                 playlist.write_text("#EXTM3U\n", encoding="utf-8")
@@ -76,7 +80,11 @@ class HLSSegmentTests(APITestCase):
 
         url = reverse(
             "video-segment",
-            kwargs={"movie_id": 1, "resolution": "720p", "segment": "segment_000.ts"},
+            kwargs={
+                "movie_id": 1,
+                "resolution": "720p",
+                "segment": "segment_000.ts",
+            },
         )
         response = self.client.get(url)
 
@@ -102,7 +110,11 @@ class HLSSegmentTests(APITestCase):
         with TemporaryDirectory() as temp_dir:
             with override_settings(MEDIA_ROOT=Path(temp_dir)):
                 segment = (
-                    Path(temp_dir) / "hls" / str(video.id) / "720p" / "segment_000.ts"
+                    Path(temp_dir)
+                    / "hls"
+                    / str(video.id)
+                    / "720p"
+                    / "segment_000.ts"
                 )
                 segment.parent.mkdir(parents=True)
                 segment.write_bytes(b"test-segment")

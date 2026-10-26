@@ -18,7 +18,9 @@ def run_ffmpeg(command):
 def create_thumbnail(video, source_path):
     """Generate and save a thumbnail for the video."""
 
-    thumbnail_path = settings.MEDIA_ROOT / "thumbnails" / f"video_{video.pk}.jpg"
+    thumbnail_path = (
+        settings.MEDIA_ROOT / "thumbnails" / f"video_{video.pk}.jpg"
+    )
     thumbnail_path.parent.mkdir(parents=True, exist_ok=True)
     run_ffmpeg([
         "ffmpeg", "-y", "-ss", "00:00:01", "-i", str(source_path),
@@ -55,5 +57,7 @@ def process_video(video_id):
         )
     create_thumbnail(video, source_path)
     for height in RESOLUTIONS:
-        output_dir = settings.MEDIA_ROOT / "hls" / str(video.pk) / f"{height}p"
+        output_dir = (
+            settings.MEDIA_ROOT / "hls" / str(video.pk) / f"{height}p"
+        )
         create_hls_variant(source_path, output_dir, height)

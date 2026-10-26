@@ -31,7 +31,7 @@ class RegistrationSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 {"confirmed_password": "Passwords do not match."},
             )
-        
+
         validate_password(attrs["password"])
         return attrs
 
