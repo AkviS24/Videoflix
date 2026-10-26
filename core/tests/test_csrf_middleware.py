@@ -88,6 +88,22 @@ class CsrfOriginMiddlewaretest(SimpleTestCase):
 
                 self.assertEqual(response.status_code, 200)
 
+    def test_allows_request_from_same_origin(self):
+        """Allow requests originating from the same host and port."""
+
+        request = self.factory.post(
+            "/admin/login/",
+            HTTP_HOST="localhost:8000",
+            HTTP_ORIGIN="http://localhost:8000",
+        )
+
+        response = self.middleware(request)
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK,
+        )
+
     def test_rejects_origin_with_wrong_port(self):
         """Reject requests when the origin uses an untrusted port."""
         request = self.factory.post(

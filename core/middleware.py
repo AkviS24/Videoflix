@@ -23,12 +23,26 @@ class CsrfOriginMiddleware:
         referer = request.headers.get("Referer")
 
         if origin:
+            if self._is_same_origin(request, origin):
+                return self.get_response(request)
             if not self._is_allowed_origin(origin):
                 return HttpResponseForbidden("Untrusted request origin.")
         elif not referer or not self._is_allowed_origin(referer):
             return HttpResponseForbidden("Missing or untrusted request origin.")
 
         return self.get_response(request)
+
+    def _is_same_origin(self, request, value):
+        """Check whether a request originates from its own host."""
+        parsed_url = urlsplit(value)
+
+        if not parsed_url.scheme or not parsed_url.netloc:
+            return False
+
+        request_origin = f"{request.scheme}://{request.get_host()}"
+        origin = f"{parsed_url.scheme}://{parsed_url.netloc}"
+
+        return origin == request_origin
 
     def _is_allowed_origin(self, value):
         """Check whether a URL belongs to a configured trusted origin."""
