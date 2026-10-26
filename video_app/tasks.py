@@ -34,7 +34,7 @@ def create_hls_variant(source_path, output_dir, height):
     output_dir.mkdir(parents=True, exist_ok=True)
     run_ffmpeg([
         "ffmpeg", "-y", "-i", str(source_path),
-        "-vf", f"^scale=-2:{height}", "-c:v", "libx264",
+        "-vf", f"scale=-2:{height}", "-c:v", "libx264",
         "-preset", "veryfast", "-crf", "23",
         "-c:a", "aac", "-b:a", "128k",
         "-f", "hls", "-hls_time", "6",
