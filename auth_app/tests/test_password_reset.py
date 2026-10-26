@@ -114,7 +114,7 @@ class PasswordResetTest(TestCase):
             self.user.check_password(self.password),
         )
 
-    def test_passowrd_confirm_rejects_invalid_token(self):
+    def test_password_confirm_rejects_invalid_token(self):
         """Reject a reset request with an invalid token."""
 
         uid = urlsafe_base64_encode(force_bytes(self.user.pk))

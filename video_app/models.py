@@ -3,7 +3,7 @@ from django.db import models
 
 
 class Video(models.Model):
-    """Stores a video`s metadata and original media file."""
+    """Store a video's metadata and original media file."""
 
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
@@ -20,4 +20,6 @@ class Video(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
+        """Return the video's title."""
+
         return self.title

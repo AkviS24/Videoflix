@@ -25,7 +25,7 @@ class RegistrationTests(TestCase):
         self.email = "newuser@example.com"
         self.password = "SecurePassword123!"
 
-    def test_registration_creates_inactive_user_and_send_authentication_mail(self):
+    def test_registration_creates_inactive_user_and_sends_activation_email(self):
         """Create an inactive user and send an authentication email for activation."""
 
         response = self.client.post(
@@ -50,8 +50,8 @@ class RegistrationTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn(self.email, mail.outbox[0].to)
 
-    def test_registration_reject_mismatched_passwords(self):
-        """The registration failed if password and confirmed_password don't match."""
+    def test_registration_rejects_mismatched_passwords(self):
+        """Registration fails if password and confirmed_password do not match."""
 
         response = self.client.post(
             self.url,
@@ -72,7 +72,7 @@ class RegistrationTests(TestCase):
         )
 
     def test_registration_rejects_existing_email(self):
-        """The registration failed if the email is already registered."""
+        """Registration fails if the email is already registered."""
 
         user_model = get_user_model()
         user_model.objects.create_user(
@@ -122,7 +122,7 @@ class RegistrationTests(TestCase):
         )
         self.assertEqual(
             response.json(),
-            {"message": "Activation succeed."}
+            {"message": "Account activated successfully."}
         )
 
         user.refresh_from_db()

@@ -13,7 +13,7 @@ from rest_framework import status
         "http://127.0.0.1:5500",
     ]
 )
-class CsrfOriginMiddlewaretest(SimpleTestCase):
+class CsrfOriginMiddlewareTest(SimpleTestCase):
     """Test origin validation for unsafe HTTP requests."""
 
     def setUp(self):
@@ -55,7 +55,7 @@ class CsrfOriginMiddlewaretest(SimpleTestCase):
         )
 
     def test_rejects_request_without_origin_or_referer(self):
-        """Rejects requests without an Origin or Referer header."""
+        """Reject requests without an Origin or Referer header."""
 
         request = self.factory.post(
             "/api/register/",
