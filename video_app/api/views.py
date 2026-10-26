@@ -9,6 +9,6 @@ from .serializers import VideoSerializer
 class VideoListView(ListAPIView):
     """Return videos for the dashboard."""
 
-    queryset = Video.objects.prefetch_related("genres").all()
+    queryset = Video.objects.all()
     serializer_class = VideoSerializer
     permission_classes = [IsAuthenticated]

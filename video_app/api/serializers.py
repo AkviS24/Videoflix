@@ -1,30 +1,24 @@
 from rest_framework import serializers
 
-from ..models import Genre, Video
-
-
-
-class GenreSerializer(serializers.ModelSerializer):
-    """Serializes genre data for the video API."""
-
-    class Meta:
-        model = Genre
-        fields = ["id", "name"]
+from ..models import Video
 
 
 
 class VideoSerializer(serializers.ModelSerializer):
     """Serializes video metadata for the video API"""
 
-    genres = GenreSerializer(many=True, read_only=True)
+    thumbnail_url = serializers.FileField(
+        source="thumbnail",
+        read_only=True,
+    )
 
     class Meta:
         model = Video
         fields = [
             "id",
+            "created_at",
             "title",
             "description",
-            "genres",
-            "original_file",
-            "created_at",
+            "thumbnail_url",
+            "category",
         ]

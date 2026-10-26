@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from video_app.models import Genre, Video
+from video_app.models import Video
 
 
 
@@ -24,8 +24,8 @@ class VideoListTest(APITestCase):
             status.HTTP_401_UNAUTHORIZED,
         )
 
-    def test_returns_videos_with_genres(self):
-        """Test that returned videos has genres."""
+    def test_returns_videos_with_category_and_thumbnail(self):
+        """Test that returned videos include category and thumbnail."""
 
         user = get_user_model().objects.create_user(
             username="testuser",
@@ -34,12 +34,11 @@ class VideoListTest(APITestCase):
         access_token = RefreshToken.for_user(user).access_token
         self.client.cookies["access_token"] = str(access_token)
 
-        genre = Genre.objects.create(name="Drama")
-        video = Video.objects.create(
+        Video.objects.create(
             title="Testvideo",
+            category="Drama",
             original_file="originals/test.mp4",
         )
-        video.genres.add(genre)
 
         response = self.client.get(
             "/api/video/",
@@ -56,6 +55,7 @@ class VideoListTest(APITestCase):
             "Testvideo",
         )
         self.assertEqual(
-            response.data[0]["genres"][0]["name"],
+            response.data[0]["category"],
             "Drama",
         )
+        self.assertIsNone(response.data[0]["thumbnail_url"])

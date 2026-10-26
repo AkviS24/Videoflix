@@ -1,14 +1,6 @@
 from django.contrib import admin
 
-from .models import Genre, Video
-
-
-
-@admin.register(Genre)
-class GenreAdmin(admin.ModelAdmin):
-    """Configure genre management in Django admin."""
-
-    search_fields = ["name"]
+from .models import Video
 
 
 
@@ -16,7 +8,6 @@ class GenreAdmin(admin.ModelAdmin):
 class VideoAdmin(admin.ModelAdmin):
     """Configures video management in Django admin."""
 
-    list_display = ["title", "created_at"]
-    list_filter = ["genres", "created_at"]
+    list_display = ["title", "category", "created_at"]
+    list_filter = ["category", "created_at"]
     search_fields = ["title", "description"]
-    filter_horizontal = ["genres"]
