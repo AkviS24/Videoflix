@@ -1,8 +1,12 @@
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
+
+from email.mime.image import MIMEImage
+from pathlib import Path
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -16,23 +20,46 @@ def send_activation_email(user):
     token = default_token_generator.make_token(user)
     frontend_url = "http://127.0.0.1:5500/pages/auth/activate.html"
     activation_url = f"{frontend_url}?uid={uid}&token={token}"
+    name_to_greet = user.email.split("@")[0]
 
-    send_mail(
+    html_content = render_to_string(
+        "emails/activation_email.html",
+        {
+            "activation_url": activation_url,
+            "name_to_greet": name_to_greet,
+        },
+    )
+    email = EmailMultiAlternatives(
         subject="Activate your Videoflix account",
-        message=(
+        body=(
             "Thank you for registering with Videoflix.\n\n"
             f"Activate your account using this link:\n{activation_url}"
         ),
         from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email],
-        html_message=(
-            '<h1 style="color:#e50914;">Welcome to Videoflix!</h1>'
-            "<p>Thank you for registering.</p>"
-            f'<p><a href="{activation_url}">'
-            "Activate your account</a></p>"
-        ),
-        fail_silently=False,
+        to=[user.email],
     )
+    email.attach_alternative(html_content, "text/html")
+    logo_path = (
+        settings.BASE_DIR
+        / "auth_app"
+        / "static"
+        / "auth_app"
+        / "emails"
+        / "images"
+        / "Logo.png"
+    )
+
+    with open(logo_path, "rb") as logo_file:
+        logo = MIMEImage(logo_file.read(), _subtype="png")
+
+    logo.add_header("Content-ID", "<videoflix-logo>")
+    logo.add_header(
+        "Content-Disposition",
+        "inline",
+        filename="Logo.png",
+    )
+    email.attach(logo)
+    email.send()
     return token
 
 
