@@ -47,3 +47,7 @@ dist/
 *.swp
 *.swo
 *~
+
+# Database backups
+videoflix_backup.sql
+*.dump
