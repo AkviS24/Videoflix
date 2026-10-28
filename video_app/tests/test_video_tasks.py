@@ -2,10 +2,13 @@ import subprocess
 
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from types import SimpleNamespace
 from unittest.mock import call, patch
 
-from django.test import TestCase, override_settings
+from django.contrib.admin.sites import AdminSite
+from django.test import TestCase, override_settings, RequestFactory
 
+from video_app.admin import VideoAdmin
 from video_app.models import Video
 from video_app.tasks import (
     create_hls_variant,
@@ -119,3 +122,28 @@ class ProcessVideoTest(TestCase):
             self.assertIn("hls", command)
             self.assertIn(str(output_dir / "index.m3u8"), command)
             self.assertTrue(output_dir.is_dir())
+
+
+
+class VideoAdminTest(TestCase):
+    """Test video processing triggered by the admin."""
+
+    @patch("video_app.admin.django_rq.get_queue")
+    def test_saving_original_video_enqueues_processing(self, mock_get_queue):
+        """Enqueue processing when the original video changes."""
+
+        video = Video.objects.create(
+            title="Testvideo",
+            category="Drama",
+            original_file="originals/test.mp4",
+        )
+        video_admin = VideoAdmin(Video, AdminSite())
+        request = RequestFactory().post("/admin/video_app/video/add/")
+        form = SimpleNamespace(changed_data=["original_file"])
+
+        video_admin.save_model(request, video, form, False)
+
+        mock_get_queue.assert_called_once_with("default")
+        mock_get_queue.return_value.enqueue.assert_called_once_with(
+            "video_app.tasks.process_video", video.pk
+        )

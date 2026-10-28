@@ -5,9 +5,20 @@ from django.db import models
 class Video(models.Model):
     """Store a video's metadata and original media file."""
 
+    CATEGORY_CHOICES = [
+        ("Drama", "Drama"),
+        ("Action", "Action"),
+        ("Comedy", "Comedy"),
+        ("Gaming", "Gaming"),
+        ("Erotic", "Erotic"),
+    ]
+
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    category = models.CharField(max_length=100)
+    category = models.CharField(
+        max_length=100,
+        choices=CATEGORY_CHOICES,
+    )
     original_file = models.FileField(upload_to="originals/")
     thumbnail = models.FileField(
         upload_to="thumbnails/",

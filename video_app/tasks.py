@@ -55,7 +55,8 @@ def process_video(video_id):
         raise FileNotFoundError(
             f"Original video file not found: {source_path}"
         )
-    create_thumbnail(video, source_path)
+    if not video.thumbnail:
+        create_thumbnail(video, source_path)
     for height in RESOLUTIONS:
         output_dir = (
             settings.MEDIA_ROOT / "hls" / str(video.pk) / f"{height}p"
