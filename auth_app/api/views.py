@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.core.mail import send_mail
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth import get_user_model
@@ -15,6 +14,7 @@ from .functions import (
     create_refresh_response,
     get_access_token,
     send_activation_email,
+    send_password_reset_email,
 )
 from .serializers import (
     LoginSerializer,
@@ -223,16 +223,7 @@ class PasswordResetView(APIView):
                 "http://127.0.0.1:5500/pages/auth/confirm_password.html"
             )
             reset_url = f"{frontend_url}?uid={uid}&token={token}"
-            send_mail(
-                subject="Reset your videoflix password.",
-                message=(
-                    "Use this link to reset your password:\n"
-                    f"{reset_url}"
-                ),
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=False,
-            )
+            send_password_reset_email(user, reset_url)
 
         return Response(
             {"detail": "If the account exists, a reset email was sent."},
