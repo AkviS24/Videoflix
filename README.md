@@ -38,7 +38,7 @@ The frontend is maintained separately. This repository contains the backend only
 - Docker-based development environment
 - FFmpeg available in the backend container for video-processing tasks
 
-The API endpoints for HLS delivery are implemented. Generating HLS playlists, video segments, and thumbnails is a separate processing step and must be implemented and verified as part of the complete video-processing workflow.
+When an original video is added or changed in Django administration, the backend enqueues a background processing job. FFmpeg generates HLS playlists and video segments in 480p, 720p, and 1080p. A thumbnail is generated when one is not already available. The processing runs through Django RQ using Redis.
 
 ## Technology Stack
 
@@ -239,8 +239,11 @@ Videoflix/
 │   │   ├── serializers.py
 │   │   ├── urls.py
 │   │   └── views.py
+│   ├── migrations/
+│   ├── admin.py
 │   ├── functions.py
 │   ├── models.py
+│   ├── tasks.py
 │   └── tests/
 ├── backend.Dockerfile
 ├── backend.entrypoint.sh
@@ -418,15 +421,15 @@ The requested resolution and file name must be valid, and the requested file mus
 
 FFmpeg is installed in the backend Docker image through the system package manager. It is available for video-processing tasks without needing to be added to `requirements.txt`.
 
-The complete workflow for converting uploaded source videos into HLS playlists and segments, generating thumbnails, and storing the generated files must be implemented and verified separately. The existence of the HLS delivery endpoints alone does not mean that video conversion is automatically performed.
+When an original video is added or changed in Django administration, a background job is enqueued through Django RQ. FFmpeg converts the source video into HLS playlists and segments for 480p, 720p, and 1080p. If no thumbnail exists, the processing task generates one. Existing thumbnails are preserved.
 
 ## Background Tasks
 
 The project includes Redis and Django RQ for background task processing.
 
-The Docker entrypoint starts an RQ worker for the `default` queue. This infrastructure can be used for long-running work such as video conversion and thumbnail generation.
+The Docker entrypoint starts an RQ worker for the `default` queue. When an original video is added or changed in Django administration, or its thumbnail is removed, the admin enqueues `video_app.tasks.process_video` on this queue.
 
-The actual tasks performed depend on the jobs implemented and enqueued by the application.
+The task uses FFmpeg to generate HLS playlists and segments for 480p, 720p, and 1080p. It creates a thumbnail only when one is not already available, preserving existing thumbnails.
 
 ## Testing
 
